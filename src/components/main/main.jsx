@@ -40,7 +40,7 @@ export default function Main(){
             </div>
             {    check &&
             <div className = "spell_check">
-                <p1>Cloest Mach: </p1>
+                <p1>Cloest Match: </p1>
                 {
                   matchlist.map(res => (<p key={res.word}>
                     {res.word}: {res.dis}
