@@ -8,70 +8,125 @@ import {useState} from "react";
 
 export default function Main(){
     const [check, setcheck] = useState(false);
-    var dict = {}
-    const matchlist = [{word: "aaa", dis: 0.0},{word: "baa", dis: 0.1},{word: "caa", dis: 1.0},{word: "ada", dis: 3.0},
-    {word: "affa", dis: 5.0},{word: "aweaa", dis: 5.5},{word: "aa12a", dis: 6.0},{word: "aaera", dis: 7.0},
-    {word: "aavva", dis: 7.8},{word: "ddaaa", dis: 8.0}];
-    
+    const dict = {}
+  
+    const levenshteinDistance = (str1, str2) => {
+      const track = Array(str2.length + 1).fill(null).map(() =>
+      Array(str1.length + 1).fill(null));
+      for (let i = 0; i <= str1.length; i += 1) {
+         track[0][i] = i;
+      }
+      for (let j = 0; j <= str2.length; j += 1) {
+         track[j][0] = j;
+      }
+      for (let j = 1; j <= str2.length; j += 1) {
+         for (let i = 1; i <= str1.length; i += 1) {
+            const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
+            track[j][i] = Math.min(
+               track[j][i - 1] + 1, // deletion
+               track[j - 1][i] + 1, // insertion
+               track[j - 1][i - 1] + indicator, // substitution
+            );
+         }
+      }
+      return track[str2.length][str1.length];
+   }
+
     const check_click = () => {
-       // if input matches any of the words in the list, then print this word is spelled correctly
         
         var spellcheck_input = document.getElementById("spellcheck_input").value;
         var incorrect = true;
         for (var value in dict) {
             if (dict[value].toLowerCase() == spellcheck_input.toLowerCase()) {
                 console.log("this word is spelled correctly");
+
+              // dictionary of all the words and their corresponding levenshtein distance
+              var levenshtein_dict = {};
+              for (var value in dict) {
+                var levenshtein_distance = levenshteinDistance(spellcheck_input, dict[value]);
+                levenshtein_dict[dict[value]] = levenshtein_distance;
+
+              }
+
+              // counts  the number of times each word appears in the dictionary
+              var word_count = {};
+              for (var value in dict) {
+                if (word_count[dict[value]] == undefined) {
+                  word_count[dict[value]] = 1;
+                } else {
+                  word_count[dict[value]] += 1;
+                }
+              }
+
+              // sorts the dictionary by the value of the levenshtein distance
+              var sorted_levenshtein_dict = {};
+              Object.keys(levenshtein_dict).sort(function(a, b) {
+                return levenshtein_dict[a] - levenshtein_dict[b];
+              }).forEach(function(key) {  
+                sorted_levenshtein_dict[key] = levenshtein_dict[key];
+              });
+
+              
+              
+              // prints the top 15 words and respective levenshtein distance and word count in the dictionary
+              var count = 0;
+              for (var key in sorted_levenshtein_dict) {
+                if (count < 15) {
+                  console.log(key + ": levenshteinDistance(" + sorted_levenshtein_dict[key] + ") * wordFrequency(" + word_count[key] + ") = suggestionScore: " + sorted_levenshtein_dict[key] * word_count[key]);
+                  count += 1;
+                }
+              }
+
                 incorrect = false;
                 break;
             }
         }        
         if (incorrect) {
             console.log("this word is spelled incorrectly");
+
+           // dictionary of all the words and their corresponding levenshtein distance
+           var levenshtein_dict = {};
+           for (var value in dict) {
+             var levenshtein_distance = levenshteinDistance(spellcheck_input, dict[value]);
+             levenshtein_dict[dict[value]] = levenshtein_distance;
+
+           }
+
+           // counts the number of times each word appears in the dictionary
+           var word_count = {};
+           for (var value in dict) {
+             if (word_count[dict[value]] == undefined) {
+               word_count[dict[value]] = 1;
+             } else {
+               word_count[dict[value]] += 1;
+             }
+           }
+
+           
+
+           // sorts the dictionary by the value of the levenshtein distance
+           var sorted_levenshtein_dict = {};
+           Object.keys(levenshtein_dict).sort(function(a, b) {
+             return levenshtein_dict[a] - levenshtein_dict[b];
+           }).forEach(function(key) {  
+             sorted_levenshtein_dict[key] = levenshtein_dict[key];
+           });
+           
+           
+           
+           // prints the top 15 words and respective levenshtein distance and word count in the dictionary
+           var count = 0;
+           for (var key in sorted_levenshtein_dict) {
+             if (count < 15) {
+               console.log(key + ": levenshteinDistance(" + sorted_levenshtein_dict[key] + ") * wordFrequency(" + word_count[key] + ") = suggestionScore: " + sorted_levenshtein_dict[key] * word_count[key]);
+               count += 1;
+             }
+           }
         }
-        // if (incorrect) {
-        //   const levenshteinDistance = (str1 = '', str2 = '') => {
-        //     const track = Array(str2.length + 1).fill(null).map(() =>
-        //     Array(str1.length + 1).fill(null));
-        //     for (let i = 0; i <= str1.length; i += 1) {
-        //        track[0][i] = i;
-        //     }
-        //     for (let j = 0; j <= str2.length; j += 1) {
-        //        track[j][0] = j;
-        //     }
-        //     for (let j = 1; j <= str2.length; j += 1) {
-        //        for (let i = 1; i <= str1.length; i += 1) {
-        //           const indicator = str1[i - 1] === str2[j - 1] ? 0 : 1;
-        //           track[j][i] = Math.min(
-        //              track[j][i - 1] + 1, // deletion
-        //              track[j - 1][i] + 1, // insertion
-        //              track[j - 1][i - 1] + indicator, // substitution
-        //           );
-        //        }
-        //     }
-        //     return track[str2.length][str1.length];
-        //  };
-        //   // computes a suggestionScore for each word in the dictionary by levenshtein distance and word frequency
-        //   var suggestionScore = [];
-        //   for (var j = 0; j < dict.length; j++) {
-        //     var word = dict[j];
-        //     var distance = levenshteinDistance(spellcheck_input, word);
-        //     var score = dict[j].dis;
-        //     suggestionScore.push(distance + score);
-        //   }
-        //   // sorts the suggestionScore array by suggestionScore
-        //   suggestionScore.sort(function(a, b) {
-        //     return a.dis - b.dis;
-        //   }
-        //   );
-        //   // prints the top 5 suggestions
-        //   console.log("suggestions: ");
-        //   for (var i = 0; i < 5; i++) {
-        //     console.log(suggestionScore[i]);
-        //   }
+       
 
-        // }
     }
-
+    
     const savedict = () => {
       // put the user input from id training_text into dict
       
@@ -104,14 +159,15 @@ export default function Main(){
                     margin = "normal"
                  />
                 <Box m={2}>
-                <Button margin="20px" size = "large" variant = "contained"  onClick = {check_click}>Check Spelling</Button>
+                <Button margin="20px" size = "large" variant = "contained"  onClick = {check_click}>Check Spelling</Button>                
                 </Box>
             </div>
             {    check &&
             <div className = "spell_check">
                 <p1>Cloest Match: </p1>
+                
                 {
-                  matchlist.map(res => (<p key={res.word}>
+                  dict.map(res => (<p key={res.word}>
                     {res.word}: {res.dis}
                   </p>))
                }
