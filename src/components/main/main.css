@@ -13,7 +13,7 @@
 }
 .inputbox{
    width: 40vw;
-   height: 30vh;
+   height: 50vh;
    min-width: 350px;
    position: absolute;
    top: 7vh;
@@ -28,7 +28,7 @@
     height: 40vh;
     min-width: 350px;
     position: absolute;
-    top: 37vh;
+    top: 60vh;
     left: 10vw;
 }
 .right{
