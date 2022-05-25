@@ -94,12 +94,13 @@ export default function Main(){
       // put the user input from id training_text into dict
       var text = document.getElementById("training_text").value;
       var t1 = text.replace(/[\r\n]/g, ""); // to remove the line-break
-      var words = t1.split(" ");
+      var t2 = t1. replace(/[\!|\.|\?|\:|\"|\[|\]|\{|\}|\(|\)]/g, ""); // and to remove some special marks
+      var words = t2.split(" ");
       // put words into dict
       var temdict = {};
       for (let i = 0; i < words.length; i++){
         if(words[i]!=""){
-        temdict[i] = words[i];
+        temdict[i] = words[i].toLowerCase();
         }
       }
       setdict(temdict);
