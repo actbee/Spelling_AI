@@ -93,7 +93,8 @@ export default function Main(){
     const savedict = () => {
       // put the user input from id training_text into dict
       var text = document.getElementById("training_text").value;
-      var words = text.split(" ");
+      var t1 = text.replace(/[\r\n]/g, ""); // to remove the line-break
+      var words = t1.split(" ");
       // put words into dict
       var temdict = {};
       for (let i = 0; i < words.length; i++){
