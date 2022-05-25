@@ -25,11 +25,15 @@
 }
 .spell_check{
     width: 40vw;
-    height: 40vh;
+    height: 30vh;
     min-width: 350px;
     position: absolute;
     top: 60vh;
     left: 10vw;
+}
+.suggest_res{
+    height: 30vh;
+    overflow: scroll;
 }
 .right{
     width: 50vw;

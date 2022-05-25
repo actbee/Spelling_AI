@@ -15,22 +15,23 @@ export default function Main(){
     const [incorrect, setincorrect] = useState(false);
     const [test, settest] = useState("NA");
     const [check_result, setcheckresult] = useState(" ");
-    var dict = {}
+    const [dict, setdict] = useState({});
+    const [suggest, setsuggest] = useState([]);
+    const [w_dis, setdis] = useState(0.5);
+    const [w_fre, setfre] = useState(0.5);
     const matchlist = [{word: "aaa", dis: 0.0},{word: "baa", dis: 0.1},{word: "caa", dis: 1.0},{word: "ada", dis: 3.0},
     {word: "affa", dis: 5.0}];
-    const predictRef = useRef(" ")
-    const dicRef = useRef(" ")
 
     
 
 
     const check_click = () => {
        // if input matches any of the words in the list, then print this word is spelled correctly
-       settest(predictRef.current.value);
+       var spellcheck_input = document.getElementById("spellcheck_input").value;
         setcheck(true);
-        var spellcheck_input = test;
         console.log(spellcheck_input);
         var incorrect = true;
+        console.log(dict);
         for (var value in dict) {
             if (dict[value].toLowerCase() == spellcheck_input.toLowerCase()) {
                 setcheckresult("this word is spelled correctly");
@@ -42,23 +43,48 @@ export default function Main(){
         if (incorrect) {
             setcheckresult("this word is spelled incorrectly");
             setincorrect(true);
-           // computes a suggestionScore for each word in the dictionary by levenshtein distance and word frequency
-           var suggestionScore = [];
-           for (var j = 0; j < dict.length; j++) {
-             var word = dict[j];
-             var distance = levenshteinDistance(spellcheck_input, word);
-             var score = dict[j].dis;
-             suggestionScore.push(distance + score);
+           // dictionary of all the words and their corresponding levenshtein distance
+           var levenshtein_dict = {};
+           for (var value in dict) {
+             var levenshtein_distance = levenshteinDistance(spellcheck_input, dict[value]);
+             levenshtein_dict[dict[value]] = levenshtein_distance;
+
            }
-           // sorts the suggestionScore array by suggestionScore
-           suggestionScore.sort(function(a, b) {
-             return a.dis - b.dis;
+
+           // counts the number of times each word appears in the dictionary
+           var word_count = {};
+           for (var value in dict) {
+             if (word_count[dict[value]] == undefined) {
+               word_count[dict[value]] = 1;
+             } else {
+               word_count[dict[value]] += 1;
+             }
            }
-           );
-           // prints the top 5 suggestions
-           console.log("suggestions: ");
-           for (var i = 0; i < 5; i++) {
-             console.log(suggestionScore[i]);
+           var score = {};
+           
+           for(var key in levenshtein_dict){
+             score[key] = levenshtein_dict[key] * w_dis - word_count[key] * w_fre;
+             console.log(levenshtein_dict[key] + "*" + w_dis + "-" + word_count[key] + "*" + w_fre );
+            }
+           console.log(score);
+
+           var items = Object.keys(score).map(function(key){
+             return [key, score[key]];
+           })
+
+           items.sort(function(first, second){
+             return first[1]-second[1];
+           })
+
+
+
+           console.log(items);
+
+           if(items.length < 15){
+           setsuggest(items);
+           }
+           else{
+             setsuggest(items.slice(0, 15));
            }
 
          }
@@ -66,14 +92,17 @@ export default function Main(){
 
     const savedict = () => {
       // put the user input from id training_text into dict
-      var text = dicRef.current.value;
+      var text = document.getElementById("training_text").value;
       var words = text.split(" ");
       // put words into dict
+      var temdict = {};
       for (let i = 0; i < words.length; i++){
-        dict[i] = words[i];
+        if(words[i]!=""){
+        temdict[i] = words[i];
+        }
       }
+      setdict(temdict);
       console.log("updated dict!");
-      console.log(dict);
     }
 
     return(
@@ -93,42 +122,45 @@ export default function Main(){
                     inputProps = {{style: {fontSize: 20}}}
                     fullWidth 
                     margin = "normal"
-                    inputRef={predictRef}
                  />
                 <Box m={2}>
                 <Button margin="20px" size = "large" variant = "contained"  onClick = {check_click}>Check Spelling</Button>
                 </Box>
                 <p>Levenshtein Distance Scalar</p>
                 <Slider
-               aria-label="distance"
-               defaultValue={50}
+               key="distance"
+               defaultValue={0.5}
                valueLabelDisplay="auto"
-               step={10}
+               step={0.1}
                marks
                min={0}
-               max={100}
+               max={1}
+               onChange = {(event, value) =>  setdis(value)}
                 />
                 <p>Word Frequency Scalar</p>
                 <Slider
-               aria-label="frequency"
-               defaultValue={50}
+               key="frequency"
+               defaultValue={0.5}
                valueLabelDisplay="auto"
-               step={10}
+               step={0.1}
                marks
                min={0}
-               max={100}
+               max={1}
+               onChange = {(event, value) =>  setfre(value)}
                 />
             </div>
             {    check &&
             <div className = "spell_check">
                 <p1>Cloest Match: </p1>   
-                <p1>{check_result}</p1>   
+                <p1>{check_result}</p1>  
+                <div className = "suggest_res">
                 {  
                     incorrect &&
-                  matchlist.map(res => (<p key={res.word}>
-                    {res.word}: {res.dis} 
-                  </p>))
+                   suggest.map( array => (
+                     <p>{array[0]} : {(array[1]-suggest[0][1]).toFixed(3)}</p>
+                   )) 
                }
+                </div>
             </div>
              }
         </div>
@@ -144,7 +176,6 @@ export default function Main(){
                     inputProps = {{style: {fontSize: 20}}}
                     fullWidth 
                     margin = "normal"
-                    inputRef={dicRef}
                  />
               <Box m={2}>
                 <Button margin="20px" size = "large" variant = "contained"  onClick = {savedict}>Update Reference Dictionary</Button>
