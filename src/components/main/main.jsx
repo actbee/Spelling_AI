@@ -27,7 +27,7 @@ export default function Main(){
 
     const check_click = () => {
        // if input matches any of the words in the list, then print this word is spelled correctly
-       var spellcheck_input = document.getElementById("spellcheck_input").value;
+       var spellcheck_input = document.getElementById("spellcheck_input").value.toLowerCase();
         setcheck(true);
         console.log(spellcheck_input);
         var incorrect = true;
