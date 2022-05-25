@@ -35,8 +35,11 @@ export default function Main(){
         for (var value in dict) {
             if (dict[value].toLowerCase() == spellcheck_input.toLowerCase()) {
                 setcheckresult("this word is spelled correctly");
+
                 incorrect = false;
                 setincorrect(false);
+        
+
                 // dictionary of all the words and their corresponding levenshtein distance
                 var levenshtein_dict = {};
                 for (var value in dict) {
@@ -55,22 +58,20 @@ export default function Main(){
                   }
                 }
                 var score = {};
-                
+
                 for(var key in levenshtein_dict){
                   score[key] = levenshtein_dict[key] * w_dis - word_count[key] * w_fre;
                   console.log(levenshtein_dict[key] + "*" + w_dis + "-" + word_count[key] + "*" + w_fre );
-                  }
+                }
                 console.log(score);
 
                 var items = Object.keys(score).map(function(key){
                   return [key, score[key]];
                 })
-
+     
                 items.sort(function(first, second){
                   return first[1]-second[1];
                 })
-
-
 
                 console.log(items);
 
@@ -205,13 +206,13 @@ export default function Main(){
                      <p>{array[0]} : {(array[1]-suggest[0][1]).toFixed(3)}</p>
                    )) 
                }
-
-                {  
+               {  
                     !incorrect &&
                    suggest.map( array => (
                      <p>{array[0]} : {(array[1]-suggest[0][1]).toFixed(3)}</p>
                    )) 
                }
+               
                 </div>
             </div>
              }
