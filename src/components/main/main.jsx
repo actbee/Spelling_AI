@@ -194,22 +194,26 @@ export default function Main(){
                max={1}
                onChange = {(event, value) =>  setfre(value)}
                 />
+                
+                <p4>word: suggestionScore = levenshtein distance x levenshtein distance scalar + word frequency x word frequency scalar</p4>
+                <br></br>
             </div>
             {    check &&
             <div className = "spell_check">
-                <p1>Cloest Match: </p1>   
+                <p1>Closest Match: </p1>   
                 <p1>{check_result}</p1>  
                 <div className = "suggest_res">
                 {  
                     incorrect &&
                    suggest.map( array => (
-                     <p>{array[0]} : {(array[1]-suggest[0][1]).toFixed(3)}</p>
+                     <p>{array[0]}: {(array[1]-suggest[0][1]).toFixed(3)} = {w_dis} + {w_fre}</p>
                    )) 
                }
-               {  
+               
+               {                  
                     !incorrect &&
                    suggest.map( array => (
-                     <p>{array[0]} : {(array[1]-suggest[0][1]).toFixed(3)}</p>
+                     <p>{array[0]}: {(array[1]-suggest[0][1]).toFixed(3)} = {w_dis} + {w_fre}</p>
                    )) 
                }
                
