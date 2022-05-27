@@ -179,7 +179,7 @@ export default function Main(){
                valueLabelDisplay="auto"
                step={0.1}
                marks
-               min={0}
+               min={-1}
                max={1}
                onChange = {(event, value) =>  setdis(value)}
                 />
@@ -190,8 +190,8 @@ export default function Main(){
                valueLabelDisplay="auto"
                step={0.1}
                marks
-               min={0}
-               max={1}
+               min={-0.5}
+               max={0.5}
                onChange = {(event, value) =>  setfre(value)}
                 />
                 
