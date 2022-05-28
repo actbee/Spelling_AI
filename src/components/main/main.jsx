@@ -17,8 +17,8 @@ export default function Main(){
     const [check_result, setcheckresult] = useState(" ");
     const [dict, setdict] = useState({});
     const [suggest, setsuggest] = useState([]);
-    const [w_dis, setdis] = useState(0.5);
-    const [w_fre, setfre] = useState(0.5);
+    const [w_dis, setdis] = useState(0);
+    const [w_fre, setfre] = useState(0);
     const matchlist = [{word: "aaa", dis: 0.0},{word: "baa", dis: 0.1},{word: "caa", dis: 1.0},{word: "ada", dis: 3.0},
     {word: "affa", dis: 5.0}];
 
@@ -175,7 +175,7 @@ export default function Main(){
                 <p>Levenshtein Distance Scalar</p>
                 <Slider
                key="distance"
-               defaultValue={0.5}
+               defaultValue={0}
                valueLabelDisplay="auto"
                step={0.1}
                marks
@@ -186,7 +186,7 @@ export default function Main(){
                 <p>Word Frequency Scalar</p>
                 <Slider
                key="frequency"
-               defaultValue={0.5}
+               defaultValue={0}
                valueLabelDisplay="auto"
                step={0.1}
                marks
@@ -206,14 +206,14 @@ export default function Main(){
                 {  
                     incorrect &&
                    suggest.map( array => (
-                     <p>{array[0]}: {(array[1]-suggest[0][1]).toFixed(3)} = {w_dis} + {w_fre}</p>
+                     <p>{array[0]}: {(array[1]-suggest[0][1]).toFixed(3)} = levenshteinDistance x {w_dis} + wordFrequency x {w_fre}</p>
                    )) 
                }
                
                {                  
                     !incorrect &&
                    suggest.map( array => (
-                     <p>{array[0]}: {(array[1]-suggest[0][1]).toFixed(3)} = {w_dis} + {w_fre}</p>
+                     <p>{array[0]}: {(array[1]-suggest[0][1]).toFixed(3)} = levenshteinDistance x {w_dis} + wordFrequency x {w_fre}</p>
                    )) 
                }
                
