@@ -17,15 +17,17 @@ export default function Main(){
     const [check_result, setcheckresult] = useState(" ");
     const [dict, setdict] = useState({});
     const [suggest, setsuggest] = useState([]);
-    const [w_dis, setdis] = useState(0);
-    const [w_fre, setfre] = useState(0);
+    const [w_dis, setdis] = useState(1);    // remember to change according to the default slider value
+    const [w_fre, setfre] = useState(-0.1);
     const matchlist = [{word: "aaa", dis: 0.0},{word: "baa", dis: 0.1},{word: "caa", dis: 1.0},{word: "ada", dis: 3.0},
     {word: "affa", dis: 5.0}];
+    const [stringlist, setstringlist] = useState({});
 
     
 
 
     const check_click = () => {
+       setstringlist({});
        // if input matches any of the words in the list, then print this word is spelled correctly
        var spellcheck_input = document.getElementById("spellcheck_input").value.toLowerCase();
         setcheck(true);
@@ -35,58 +37,13 @@ export default function Main(){
         for (var value in dict) {
             if (dict[value].toLowerCase() == spellcheck_input.toLowerCase()) {
                 setcheckresult("this word is spelled correctly");
-
                 incorrect = false;
                 setincorrect(false);
-        
-
-                // dictionary of all the words and their corresponding levenshtein distance
-                var levenshtein_dict = {};
-                for (var value in dict) {
-                  var levenshtein_distance = levenshteinDistance(spellcheck_input, dict[value]);
-                  levenshtein_dict[dict[value]] = levenshtein_distance;
-
-                }
-
-                // counts the number of times each word appears in the dictionary
-                var word_count = {};
-                for (var value in dict) {
-                  if (word_count[dict[value]] == undefined) {
-                    word_count[dict[value]] = 1;
-                  } else {
-                    word_count[dict[value]] += 1;
-                  }
-                }
-                var score = {};
-
-                for(var key in levenshtein_dict){
-                  score[key] = levenshtein_dict[key] * w_dis - word_count[key] * w_fre;
-                  console.log(levenshtein_dict[key] + "*" + w_dis + "-" + word_count[key] + "*" + w_fre );
-                }
-                console.log(score);
-
-                var items = Object.keys(score).map(function(key){
-                  return [key, score[key]];
-                })
-     
-                items.sort(function(first, second){
-                  return first[1]-second[1];
-                })
-
-                console.log(items);
-
-                if(items.length < 15){
-                setsuggest(items);
-                }
-                else{
-                  setsuggest(items.slice(0, 15));
-                }
-                break;
-            }
         }        
-        if (incorrect) {
+        else {
             setcheckresult("this word is spelled incorrectly");
             setincorrect(true);
+        }
            // dictionary of all the words and their corresponding levenshtein distance
            var levenshtein_dict = {};
            for (var value in dict) {
@@ -105,11 +62,13 @@ export default function Main(){
              }
            }
            var score = {};
-           
+           var stlist = {};
            for(var key in levenshtein_dict){
-             score[key] = levenshtein_dict[key] * w_dis - word_count[key] * w_fre;
-             console.log(levenshtein_dict[key] + "*" + w_dis + "-" + word_count[key] + "*" + w_fre );
+             score[key] = levenshtein_dict[key] * w_dis + word_count[key] * w_fre;
+             console.log(levenshtein_dict[key] + "*" + w_dis + "+" + word_count[key] + "*" + w_fre );
+             stlist[key] = levenshtein_dict[key].toString() + "*" + w_dis.toString() + "+" +word_count[key].toString() + "*" + w_fre.toString();
             }
+            setstringlist(stlist);
            console.log(score);
 
            var items = Object.keys(score).map(function(key){
@@ -175,7 +134,7 @@ export default function Main(){
                 <p>Levenshtein Distance Scalar</p>
                 <Slider
                key="distance"
-               defaultValue={0}
+               defaultValue={1}
                valueLabelDisplay="auto"
                step={0.1}
                marks
@@ -186,7 +145,7 @@ export default function Main(){
                 <p>Word Frequency Scalar</p>
                 <Slider
                key="frequency"
-               defaultValue={0}
+               defaultValue={-0.1}
                valueLabelDisplay="auto"
                step={0.1}
                marks
@@ -203,20 +162,11 @@ export default function Main(){
                 <p1>Closest Match: </p1>   
                 <p1>{check_result}</p1>  
                 <div className = "suggest_res">
-                {  
-                    incorrect &&
+               {
                    suggest.map( array => (
-                     <p>{array[0]}: {(array[1]-suggest[0][1]).toFixed(3)} = levenshteinDistance x {w_dis} + wordFrequency x {w_fre}</p>
+                     <p>{array[0]}: {(array[1]).toFixed(3)} = {stringlist[array[0]]}</p>
                    )) 
-               }
-               
-               {                  
-                    !incorrect &&
-                   suggest.map( array => (
-                     <p>{array[0]}: {(array[1]-suggest[0][1]).toFixed(3)} = levenshteinDistance x {w_dis} + wordFrequency x {w_fre}</p>
-                   )) 
-               }
-               
+                   }
                 </div>
             </div>
              }
