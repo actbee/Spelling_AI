@@ -27,7 +27,7 @@ export default function Main(){
     const [dict, setdict] = useState({});
     const [suggest, setsuggest] = useState([]);
     const [w_dis, setdis] = useState(1);    // remember to change according to the default slider value
-    const [w_fre, setfre] = useState(-0.1);
+    const [w_fre, setfre] = useState(-0.01);
     const matchlist = [{word: "aaa", dis: 0.0},{word: "baa", dis: 0.1},{word: "caa", dis: 1.0},{word: "ada", dis: 3.0},
     {word: "affa", dis: 5.0}];
     const [stringlist, setstringlist] = useState({});
@@ -213,12 +213,12 @@ const preload = () => {
                 <p>Word Frequency Scalar</p>
                 <Slider
                key="frequency"
-               defaultValue={-0.1}
+               defaultValue={-0.01}
                valueLabelDisplay="auto"
-               step={0.1}
+               step={0.01}
                marks
-               min={-0.5}
-               max={0.5}
+               min={-0.1}
+               max={0.1}
                onChange = {(event, value) =>  setfre(value)}
                 />
                 
