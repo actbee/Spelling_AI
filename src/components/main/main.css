@@ -38,7 +38,7 @@
 .right{
     width: 50vw;
     height: 100vh;
-    display: flex;
+   overflow: scroll;
 }
 .train_text{
     margin: 5vw;
@@ -51,4 +51,12 @@
 }
 p1{
     font-size: 20px;
+}
+.pre_load{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin: 10px;
+    width: 40vw;
 }

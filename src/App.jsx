@@ -3,7 +3,7 @@ import './App.css';
 import {Route, Routes} from "react-router-dom";
 import Main from "./components/main/main"
 import Error from "./components/error"
-
+import React from "react"; 
 function App() {
   return (
     <div className="App">

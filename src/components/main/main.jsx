@@ -3,11 +3,20 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { Link } from "react-router-dom";
 import Box from '@mui/material/Box';
-
+import React from "react"; 
 import Slider from '@mui/material/Slider';
 import TextField from '@mui/material/TextField';
 import {useState, useRef} from "react";
-import {levenshteinDistance} from "../distance/distance"
+import {levenshteinDistance} from "../distance/distance";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Select from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
+import {HARRY_POTTER_TXT, CAT_IN_THE_HAT_TXT,MY_FATHERS_DRAGON_TXT, WIND_IN_THE_WILLOWS_TXT,SOPHIES_WORLD_TXT } from "../books/books";
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 
 export default function Main(){
@@ -23,7 +32,6 @@ export default function Main(){
     {word: "affa", dis: 5.0}];
     const [stringlist, setstringlist] = useState({});
 
-    
 
 
     const check_click = () => {
@@ -97,7 +105,7 @@ export default function Main(){
       // put the user input from id training_text into dict
       var text = document.getElementById("training_text").value;
       var t1 = text.replace(/[\r\n]/g, ""); // to remove the line-break
-      var t2 = t1. replace(/[\!|\.|\?|\:|\"|\[|\]|\{|\}|\(|\)]/g, ""); // and to remove some special marks
+      var t2 = t1.replace(/[\!|\.|\?|\:|\"|\[|\]|\{|\}|\(|\)]/g, ""); // and to remove some special marks
       var words = t2.split(" ");
       // put words into dict
       var temdict = {};
@@ -109,6 +117,66 @@ export default function Main(){
       setdict(temdict);
       console.log("updated dict!");
     }
+
+
+// below is the preload select box part-------------------------------
+
+    const ITEM_HEIGHT = 48;
+    const ITEM_PADDING_TOP = 8;
+    const MenuProps = {
+      PaperProps: {
+        style: {
+          maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+          width: 250,
+        },
+      },
+    };
+    
+    const names = [
+       "Cat in the Hat",
+       "Harry Potter",
+       "My Father's Dragon",
+       "Wind in the Willows",
+       "Sophie's World"
+    ];
+        
+    const [bookName, setBookName] = useState([]);
+
+
+    const handleChange = (event) => {
+      const {
+        target: { value },
+      } = event;
+      setBookName(
+        // On autofill we get a stringified value.
+        typeof value === 'string' ? value.split(',') : value,
+      );
+    };
+
+// ------------------------------------------------------------------
+
+const preload = () => {
+  var traintext = document.getElementById("training_text").value;
+   if(bookName.indexOf("Harry Potter")>-1){
+    traintext += HARRY_POTTER_TXT;
+   }
+   if(bookName.indexOf("Cat in the Hat")>-1){
+    traintext += CAT_IN_THE_HAT_TXT;
+ }
+   if(bookName.indexOf("My Father's Dragon")>-1){
+    traintext += MY_FATHERS_DRAGON_TXT;
+   }
+   if(bookName.indexOf("Wind in the Willows")>-1){
+    traintext += WIND_IN_THE_WILLOWS_TXT;
+   }
+   if(bookName.indexOf("Sophie's World")>-1){
+    traintext += SOPHIES_WORLD_TXT;
+   }
+   if(traintext.length > 6000){
+     traintext = traintext.slice(0, 6000);
+   }
+   document.getElementById("training_text").value = traintext
+}
 
     return(
         <div className = "main">
@@ -174,18 +242,46 @@ export default function Main(){
         <div className = "right">
             <div className = "train_text">
             <p1>Enter texts to train: </p1>
+            <div className = "pre_load">
+            <FormControl size="small" sx={{ m: 0.5, width: 350}}>
+        <Select
+          labelId="demo-multiple-checkbox-label" 
+          id="demo-multiple-checkbox"
+          multiple
+          value={bookName}
+          onChange={handleChange}
+          input={<OutlinedInput />}
+          renderValue={(selected) => selected.join(', ')}
+          MenuProps={MenuProps}
+        >
+          {names.map((name) => (
+            <MenuItem key={name} value={name}>
+              <Checkbox checked={bookName.indexOf(name) > -1} />
+              <ListItemText primary={name} />
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+            <Button margin="20px" size = "large" variant = "contained"  onClick = {preload}>Preload</Button>
+            </div>
             <TextField
                     id="training_text"
-                    label="Training Text"
                     multiline
-                    rows={20}
+                    rows={18}
                     padding
                     inputProps = {{style: {fontSize: 20}}}
                     fullWidth 
                     margin = "normal"
+                    inputProps={{
+                      maxLength: 6000,
+                    }}
                  />
               <Box m={2}>
                 <Button margin="20px" size = "large" variant = "contained"  onClick = {savedict}>Update Reference Dictionary</Button>
+                <IconButton aria-label="delete"  className = "delete_button" onClick={() => (document.getElementById("training_text").value = "")}>
+                    <DeleteIcon sx = {{fontSize: 40 }} />
+              </IconButton>
+
               </Box>     
             </div>
         </div>
