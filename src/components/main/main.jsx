@@ -41,7 +41,8 @@ export default function Main(){
         setcheck(true);
         console.log(spellcheck_input);
         var incorrect = true;
-        console.log(dict);
+        console.log("dict", dict);
+        setsuggest([]);
         for (var value in dict) {
             if (dict[value].toLowerCase() == spellcheck_input.toLowerCase()) {
                 setcheckresult("this word is spelled correctly");
@@ -175,7 +176,8 @@ const preload = () => {
    if(traintext.length > 6000){
      traintext = traintext.slice(0, 6000);
    }
-   document.getElementById("training_text").value = traintext
+   document.getElementById("training_text").value = traintext;
+   savedict();
 }
 
     return(
@@ -263,6 +265,10 @@ const preload = () => {
         </Select>
       </FormControl>
             <Button margin="20px" size = "large" variant = "contained"  onClick = {preload}>Preload</Button>
+            <IconButton aria-label="delete"  className = "delete_button" onClick={() => (document.getElementById("training_text").value = "", savedict())}>
+                    <DeleteIcon sx = {{fontSize: 40 }} />
+              </IconButton>
+
             </div>
             <TextField
                     id="training_text"
@@ -273,16 +279,10 @@ const preload = () => {
                     fullWidth 
                     margin = "normal"
                     inputProps={{
-                      maxLength: 6000,
+                      maxLength: 4000,
                     }}
+                    onChange = {savedict}
                  />
-              <Box m={2}>
-                <Button margin="20px" size = "large" variant = "contained"  onClick = {savedict}>Update Reference Dictionary</Button>
-                <IconButton aria-label="delete"  className = "delete_button" onClick={() => (document.getElementById("training_text").value = "")}>
-                    <DeleteIcon sx = {{fontSize: 40 }} />
-              </IconButton>
-
-              </Box>     
             </div>
         </div>
         </div>    
