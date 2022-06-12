@@ -3,7 +3,8 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { Link } from "react-router-dom";
 import Box from '@mui/material/Box';
-import React from "react"; 
+import CircularProgress from '@mui/material/CircularProgress';
+import React, { useEffect } from "react"; 
 import Slider from '@mui/material/Slider';
 import TextField from '@mui/material/TextField';
 import {useState, useRef} from "react";
@@ -20,7 +21,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 
 export default function Main(){
-    const [check, setcheck] = useState(false);
     const [incorrect, setincorrect] = useState(false);
     const [test, settest] = useState("NA");
     const [check_result, setcheckresult] = useState(" ");
@@ -31,75 +31,104 @@ export default function Main(){
     const matchlist = [{word: "aaa", dis: 0.0},{word: "baa", dis: 0.1},{word: "caa", dis: 1.0},{word: "ada", dis: 3.0},
     {word: "affa", dis: 5.0}];
     const [stringlist, setstringlist] = useState({});
+    const [loading, setloading] = useState(false);
 
 
+    // function setStateAsync(state){
+    //   return new Promise((resolve) => {
+    //     setloading(state)
+    //   });
+    // }
 
-    const check_click = () => {
-       setstringlist({});
-       // if input matches any of the words in the list, then print this word is spelled correctly
-       var spellcheck_input = document.getElementById("spellcheck_input").value.toLowerCase();
-        setcheck(true);
-        console.log(spellcheck_input);
-        var incorrect = true;
-        console.log("dict", dict);
-        setsuggest([]);
-        for (var value in dict) {
-            if (dict[value].toLowerCase() == spellcheck_input.toLowerCase()) {
-                setcheckresult("this word is spelled correctly");
-                incorrect = false;
-                setincorrect(false);
-        }        
-        else {
-            setcheckresult("this word is spelled incorrectly");
-            setincorrect(true);
-        }
-           // dictionary of all the words and their corresponding levenshtein distance
-           var levenshtein_dict = {};
-           for (var value in dict) {
-             var levenshtein_distance = levenshteinDistance(spellcheck_input, dict[value]);
-             levenshtein_dict[dict[value]] = levenshtein_distance;
+    // async function check_click() { 
+    //   useEffect(() => {
+    //     async function caculate(){
+    //   await setStateAsync(true);
+    //   console.log("change loading")
+    //   await spell_check();
+    //   await setStateAsync(false);
+    // }});
+    // }
 
-           }
+    useEffect(()=>{
+      if (loading) {
+        setTimeout(() => {
+          spell_check().then(setloading(false))
+        }, 1000);
 
-           // counts the number of times each word appears in the dictionary
-           var word_count = {};
-           for (var value in dict) {
-             if (word_count[dict[value]] == undefined) {
-               word_count[dict[value]] = 1;
-             } else {
-               word_count[dict[value]] += 1;
-             }
-           }
-           var score = {};
-           var stlist = {};
-           for(var key in levenshtein_dict){
-             score[key] = levenshtein_dict[key] * w_dis + word_count[key] * w_fre;
-             console.log(levenshtein_dict[key] + "*" + w_dis + "+" + word_count[key] + "*" + w_fre );
-             stlist[key] = levenshtein_dict[key].toString() + "*" + w_dis.toString() + "+" +word_count[key].toString() + "*" + w_fre.toString();
+      }
+    }, [loading])
+
+    function check_click(){
+      setloading(true)
+    }
+
+    async function spell_check(){
+      setstringlist({});
+      // if input matches any of the words in the list, then print this word is spelled correctly
+      var spellcheck_input = document.getElementById("spellcheck_input").value.toLowerCase();
+       console.log(spellcheck_input);
+       var incorrect = true;
+       console.log("dict", dict);
+       setsuggest([]);
+       for (var value in dict) {
+           if (dict[value].toLowerCase() == spellcheck_input.toLowerCase()) {
+               setcheckresult("this word is spelled correctly");
+               incorrect = false;
+               setincorrect(false);
+       }        
+       else {
+           setcheckresult("this word is spelled incorrectly");
+           setincorrect(true);
+       }
+          // dictionary of all the words and their corresponding levenshtein distance
+          var levenshtein_dict = {};
+          for (var value in dict) {
+            var levenshtein_distance = levenshteinDistance(spellcheck_input, dict[value]);
+            levenshtein_dict[dict[value]] = levenshtein_distance;
+
+          }
+
+          // counts the number of times each word appears in the dictionary
+          var word_count = {};
+          for (var value in dict) {
+            if (word_count[dict[value]] == undefined) {
+              word_count[dict[value]] = 1;
+            } else {
+              word_count[dict[value]] += 1;
             }
-            setstringlist(stlist);
-           console.log(score);
-
-           var items = Object.keys(score).map(function(key){
-             return [key, score[key]];
-           })
-
-           items.sort(function(first, second){
-             return first[1]-second[1];
-           })
-
-
-
-           console.log(items);
-
-           if(items.length < 15){
-           setsuggest(items);
+          }
+          var score = {};
+          var stlist = {};
+          for(var key in levenshtein_dict){
+            score[key] = levenshtein_dict[key] * w_dis + word_count[key] * w_fre;
+            console.log(levenshtein_dict[key] + "*" + w_dis + "+" + word_count[key] + "*" + w_fre );
+            stlist[key] = levenshtein_dict[key].toString() + "*" + w_dis.toString() + "+" +word_count[key].toString() + "*" + w_fre.toString();
            }
-           else{
-             setsuggest(items.slice(0, 15));
-           }
+           setstringlist(stlist);
+          console.log(score);
 
-         }
+          var items = Object.keys(score).map(function(key){
+            return [key, score[key]];
+          })
+
+          items.sort(function(first, second){
+            return first[1]-second[1];
+          })
+
+
+
+          console.log(items);
+
+          if(items.length < 15){
+          setsuggest(items);
+          }
+          else{
+            setsuggest(items.slice(0, 15));
+          }
+          
+        }
+        // setloading(false);
     }
 
     const savedict = () => {
@@ -227,8 +256,17 @@ const preload = () => {
                 <p4>word: suggestionScore = levenshtein distance x levenshtein distance scalar + word frequency x word frequency scalar</p4>
                 <br></br>
             </div>
-            {    check &&
+            {
+               loading &&
+               <div className = "spell_check">
+                  <Box sx={{ display: 'flex' }}>
+                        <CircularProgress />
+                 </Box>
+                 </div>
+            }
+            {    !loading &&
             <div className = "spell_check">
+              
                 <p1>Closest Match: </p1>   
                 <p1>{check_result}</p1>  
                 <div className = "suggest_res">
@@ -273,13 +311,13 @@ const preload = () => {
             <TextField
                     id="training_text"
                     multiline
-                    rows={18}
+                    rows={21}
                     padding
                     inputProps = {{style: {fontSize: 20}}}
                     fullWidth 
                     margin = "normal"
                     inputProps={{
-                      maxLength: 4000,
+                      maxLength: 8000,
                     }}
                     onChange = {savedict}
                  />
